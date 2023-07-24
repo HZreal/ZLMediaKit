@@ -92,6 +92,7 @@ private:
     uint32_t _continue_push_ms = 0;
     //消耗的总流量
     uint64_t _total_bytes = 0;
+    std::list<RtmpPacket::Ptr> _pending_cfgs;
     //数据接收超时计时器
     toolkit::Ticker _ticker;
     MediaInfo _media_info;

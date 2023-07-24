@@ -194,6 +194,12 @@ void RtmpSession::onCmd_publish(AMFDecoder &dec) {
                     "clientid", "0" });
 
         setSocketFlags();
+
+        // re apply cfgs write
+        for (auto cfg : _pending_cfgs) {
+            onRtmpChunk(cfg);
+        }
+        _pending_cfgs.clear();
     };
 
     if(_media_info.app.empty() || _media_info.stream.empty()){
@@ -536,6 +542,10 @@ void RtmpSession::onRtmpChunk(RtmpPacket::Ptr packet) {
     case MSG_AUDIO:
     case MSG_VIDEO: {
         if (!_push_src) {
+            // save pending cfgs
+            if (packet->isConfigFrame()) {
+                _pending_cfgs.push_back(packet);
+            }
             WarnL << "Not a rtmp push!";
             return;
         }
